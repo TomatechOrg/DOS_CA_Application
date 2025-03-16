@@ -1,32 +1,46 @@
-# This config was automatically generated from your source code
-# Stacks detected: deps:node:.
 version: 2.1
 orbs:
   node: circleci/node@5
+
 jobs:
-  test-node:
-    # Install node dependencies and run tests
-    executor: node/default
+  build:
+    working_directory: ~/ca_app
+    docker:
+      - image: circleci/node:10.16.3
     steps:
       - checkout
-      - node/install-packages:
-          pkg-manager: npm
       - run:
-          name: Run tests
-          command: npm test --passWithNoTests
+          name: update-npm
+          command: 'sudo npm install -g npm@5'
+      - restore_cache:
+          key: dependancy-cache-{{ checksum "package-lock.json" }}
+      - run:
+          name: install-npm
+          command: npm install
+      - save_cache:
+          key: dependancy-cache-{{ checksum "package-lock.json" }}
+          paths:
+            - ./node_modules
   deploy:
-    # This is an example deploy job, not actually used by the workflow
     docker:
-      - image: cimg/base:stable
+      - image: circleci/node:10.16.3
     steps:
-      # Replace this with steps to deploy to users
       - run:
-          name: deploy
-          command: '#e.g. ./deploy.sh'
+          name: deploy-app
+          command: 'ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_IP "rm -rf DOS_CA_Application/;git clone https://github.com/TomatechOrg/DOS_CA_Application.git; source DOS_CA_Application/deploy.sh"'
+
 workflows:
-  build-and-test:
+  build:
     jobs:
-      - test-node
-    # - deploy:
-    #     requires:
-    #       - test-node
+      - build:
+        filters:
+          branches:
+            only:
+              - main
+      - deploy:
+        filters:
+          branches:
+            only:
+              - main
+        requires:
+          - build
