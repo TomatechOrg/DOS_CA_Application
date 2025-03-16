@@ -30,17 +30,18 @@ jobs:
           command: 'ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_IP "rm -rf DOS_CA_Application/;git clone https://github.com/TomatechOrg/DOS_CA_Application.git; source DOS_CA_Application/deploy.sh"'
 
 workflows:
+  version: 2
   build:
     jobs:
       - build:
-        filters:
-          branches:
-            only:
-              - main
+          filters:
+            branches:
+              only:
+                - main
       - deploy:
-        filters:
-          branches:
-            only:
-              - main
-        requires:
-          - build
+          filters:
+            branches:
+              only:
+                - main
+          requires:
+            - build
