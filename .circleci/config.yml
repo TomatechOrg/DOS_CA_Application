@@ -27,7 +27,7 @@ jobs:
     steps:
       - run:
           name: deploy-app
-          command: 'ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_IP "export SERVER=\"$EC2_CERT\";export PRIVATE_KEY=\"EC2_PRIVATE_KEY\";rm -rf DOS_CA_Application/;git clone https://github.com/TomatechOrg/DOS_CA_Application.git; source DOS_CA_Application/deploy.sh"'
+          command: 'ssh -o StrictHostKeyChecking=no $EC2_USERNAME@$EC2_IP "export SERVER=\"$EC2_CERT\";export PRIVATE_KEY=\"$EC2_PRIVATE_KEY\";rm -rf DOS_CA_Application/;git clone https://github.com/TomatechOrg/DOS_CA_Application.git; source DOS_CA_Application/deploy.sh"'
 
 workflows:
   version: 2
